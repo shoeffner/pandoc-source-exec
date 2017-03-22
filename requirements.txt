@@ -1,0 +1,6 @@
+future==0.16.0
+panflute==1.10.3
+pexpect==4.2.1
+ptyprocess==0.5.1
+PyYAML==3.12
+shutilwhich==1.1.0
