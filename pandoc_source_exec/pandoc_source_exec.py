@@ -151,7 +151,7 @@ def action(elem, doc):
 
                 elems += [
                     pf.Para(pf.Emph(pf.Str('Output:'))),
-                    pf.CodeBlock(result, classes=[elem.classes[0]]),
+                    pf.CodeBlock(result, classes=['changelog']),
                 ]
 
         return elems
