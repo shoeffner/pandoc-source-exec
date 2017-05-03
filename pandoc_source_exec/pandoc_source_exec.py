@@ -129,6 +129,29 @@ def read_file(filename):
         return f.read()
 
 
+def remove_import_statements(code):
+    """Removes lines with import statements from the code.
+
+    Args:
+        code: The code to be stripped.
+
+    Returns:
+        The code without import statements.
+    """
+    new_code = []
+    for line in code.splitlines():
+        if not line.lstrip().startswith('import ') and \
+           not line.lstrip().startswith('from '):
+            new_code.append(line)
+
+    while new_code and new_code[0] == '':
+        new_code.pop(0)
+    while new_code and new_code[-1] == '':
+        new_code.pop()
+
+    return '\n'.join(new_code)
+
+
 def prepare(doc):
     pass
 
@@ -148,6 +171,9 @@ def action(elem, doc):
                 elem.text = execute_interactive_code(elem, doc)
             else:
                 result = execute_code_block(elem, doc)
+
+                if 'hideimports' in elem.classes:
+                    elem.text = remove_import_statements(elem.text)
 
                 elems += [
                     pf.Para(pf.Emph(pf.Str('Output:'))),

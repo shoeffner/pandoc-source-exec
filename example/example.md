@@ -13,6 +13,7 @@ pandoc --filter pandoc-source-exec \
        -o example.pdf example.md
 ```
 
+
 # Usage
 
 To execute code, add the class `exec` to your code:
@@ -157,6 +158,10 @@ file=
     it from `python` which defaults to `python3`. Can be overwritten by
     specifying `cmd=`.
 
+`.hideimports`
+~ Hides import statements in output. Currently only supported for Python.
+
+
 ## Supported languages
 
 To be used with `runas=`, if it does not already match the language identifier:
@@ -209,9 +214,30 @@ print 'runas=python2'
 print('runas=python3')
 ```
 
-
 ### ruby
 
 ```{ .ruby .exec }
 puts 'ruby'
+```
+
+## Removing imports
+
+Removing imports affects only the final code rendering, not the execution.
+
+~~~markdown
+```{ .python .exec .hideimports }
+import statistics
+
+
+print(statistics.mean([1, 2, 3])
+```
+~~~
+
+Results in
+
+```{ .python .exec .hideimports }
+import statistics
+
+
+print(statistics.mean([1, 2, 3]))
 ```
