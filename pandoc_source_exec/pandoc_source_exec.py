@@ -3,7 +3,6 @@ add the output to the pandoc document."""
 
 import glob
 import subprocess
-
 try:
     from pexpect import replwrap
 except ImportError:
@@ -61,7 +60,10 @@ def execute_code_block(elem, doc):
         The output of the command.
     """
     command = select_executor(elem, doc).split(' ')
-    command.append(elem.text)
+    code = elem.text
+    if 'plt' in elem.attributes or 'plt' in elem.classes:
+        code = save_plot(code, elem)
+    command.append(code)
 
     return subprocess.run(command,
                           encoding='utf8',
@@ -152,13 +154,52 @@ def remove_import_statements(code):
     return '\n'.join(new_code)
 
 
+def save_plot(code, elem):
+    """Converts matplotlib plots to tikz code.
+
+    If elem has either the plt attribute (format: plt=width,height) or
+    the attributes width=width and/or height=height, the figurewidth and -height
+    are set accordingly. If none are given, a height of 4cm and a width of 6cm
+    is used as default.
+
+    Args:
+        code: The matplotlib code.
+        elem: The element.
+
+    Returns:
+        The code and some code to invoke matplotlib2tikz.
+    """
+    if 'plt' in elem.attributes:
+        figurewidth, figureheight = elem.attributes['plt'].split(',')
+    else:
+        try:
+            figureheight = elem.attributes['height']
+        except KeyError:
+            figureheight = '4cm'
+
+        try:
+            figurewidth = elem.attributes['width']
+        except KeyError:
+            figurewidth = '6cm'
+
+    return code + f"""
+from matplotlib2tikz import get_tikz_code
+tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidth}')
+print(tikz)"""
+
+
 def prepare(doc):
-    pass
+    include = pf.RawInline('\\usepackage{pgfplots}', format='tex')
+    try:
+        doc.metadata['header-includes'][0] = include
+    except KeyError:
+        doc.metadata['header-includes'] = include
 
 
 def action(elem, doc):
     if isinstance(elem, pf.CodeBlock):
-        elems = [elem]
+
+        elems = [elem] if 'hide' not in elem.classes else []
 
         if 'file' in elem.attributes.keys():
             elem.text = read_file(elem.attributes['file'])
@@ -175,10 +216,15 @@ def action(elem, doc):
                 if 'hideimports' in elem.classes:
                     elem.text = remove_import_statements(elem.text)
 
-                elems += [
-                    pf.Para(pf.Emph(pf.Str('Output:'))),
-                    pf.CodeBlock(result, classes=['changelog']),
-                ]
+                if 'plt' in elem.attributes or 'plt' in elem.classes:
+                    result = '\n'.join(['\\begin{center}'] + \
+                                       result.splitlines()[10:] + \
+                                       ['\\end{center}'])
+                    block = pf.RawBlock(result, format='latex')
+                else:
+                    block = pf.CodeBlock(result, classes=['changelog'])
+
+                elems += [pf.Para(pf.Emph(pf.Str('Output:'))), block]
 
         return elems
 

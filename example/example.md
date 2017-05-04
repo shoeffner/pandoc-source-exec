@@ -220,6 +220,7 @@ print('runas=python3')
 puts 'ruby'
 ```
 
+
 ## Removing imports
 
 Removing imports affects only the final code rendering, not the execution.
@@ -241,3 +242,24 @@ import statistics
 
 print(statistics.mean([1, 2, 3]))
 ```
+
+
+## Plotting matplotlib
+
+~~~markdown
+```{ .python .exec .plt }
+import matplotlib.pyplot as plt
+
+plt.plot([1, 2, 3])
+```
+~~~
+
+```{ .python .exec .plt }
+import matplotlib.pyplot as plt
+
+plt.plot([1, 2, 3])
+```
+
+Additionally `width=6cm` and `height=5cm` can be used. As a shortcut, one can
+instead use `plt=6cm,5cm`.
+

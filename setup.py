@@ -34,7 +34,8 @@ setup(
       'Programming Language :: Python :: 3.6',
       'Topic :: Text Processing :: Filters',
   ],
-  install_requires=['panflute>=1.10.3', 'pexpect>=4.2.1'],
+  install_requires=['panflute>=1.10.3', 'pexpect>=4.2.1',
+                    'matplotlib2tikz>=0.6.6'],
   license='MIT',
   keywords=['pandoc', 'filter', 'code', 'execution'],
 )
