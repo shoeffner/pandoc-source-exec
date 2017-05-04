@@ -189,9 +189,12 @@ print(tikz)"""
 
 
 def prepare(doc):
-    include = pf.RawInline('\\usepackage{pgfplots}', format='tex')
+    usepackage = '\\usepackage{pgfplots}'
+    include = pf.RawInline(usepackage, format='tex')
     try:
-        doc.metadata['header-includes'][0] = include
+        if usepackage not in str(doc.metadata['header-includes']):
+            doc.metadata['header-includes']._content.list \
+                .insert(0, pf.MetaInlines(include))
     except KeyError:
         doc.metadata['header-includes'] = include
 

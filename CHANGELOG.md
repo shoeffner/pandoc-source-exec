@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Bugfix: when overwriting header-includes, pgfplots is now properly added and does not overwrite anymore.
+
+
 ## 0.1.1
 
 - Adding `.hideimports` for Python to hide import statements.
