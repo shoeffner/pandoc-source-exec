@@ -39,6 +39,6 @@ Just use pip to install it from `pypi`_
 Future
 ------
 
-- [ ] Execute code other than python
-- [ ] Refactor interactive execution, build REPL wrappers.
-- [ ] Allow configurable pre- and postfixes for the output
+- Execute code other than python
+- Refactor interactive execution, build REPL wrappers.
+- Allow configurable pre- and postfixes for the output
