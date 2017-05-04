@@ -1,5 +1,5 @@
 pandoc-source-exec
-===============
+==================
 
 ``pandoc-source-exec`` is a `panflute`_ `pandoc`_ `filter`_.
 
