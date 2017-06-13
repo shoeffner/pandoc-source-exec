@@ -2,7 +2,9 @@
 add the output to the pandoc document."""
 
 import glob
+import os
 import subprocess
+
 try:
     from pexpect import replwrap
 except ImportError:
@@ -65,10 +67,13 @@ def execute_code_block(elem, doc):
         code = save_plot(code, elem)
     command.append(code)
 
+    cwd = elem.attributes['wd'] if 'wd' in elem.attributes else None
+
     return subprocess.run(command,
                           encoding='utf8',
                           stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT).stdout
+                          stderr=subprocess.STDOUT,
+                          cwd=cwd).stdout
 
 
 def execute_interactive_code(elem, doc):
@@ -188,6 +193,21 @@ tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidt
 print(tikz)"""
 
 
+def trimpath(attributes):
+    if 'pathdepth' in attributes:
+        if attributes['pathdepth'] != 'full':
+            pathelements = []
+            remainder = attributes['file']
+            limit = int(attributes['pathdepth'])
+            pf.debug('rem', remainder, 'limit', limit)
+            while len(pathelements) < limit and remainder:
+                remainder, pe = os.path.split(remainder)
+                pathelements.insert(0, pe)
+            return os.path.join(*pathelements)
+        return attributes['file']
+    return os.path.basename(attributes['file'])
+
+
 def prepare(doc):
     usepackage = '\\usepackage{pgfplots}'
     include = pf.RawInline(usepackage, format='tex')
@@ -208,7 +228,7 @@ def action(elem, doc):
             elem.text = read_file(elem.attributes['file'])
             elems.insert(0, pf.Para(pf.Emph(pf.Str('File:')),
                                     pf.Space,
-                                    pf.Code(elem.attributes['file'])))
+                                    pf.Code(trimpath(elem.attributes))))
 
         if 'exec' in elem.classes:
             if 'interactive' in elem.classes or elem.text[:4] == '>>> ':

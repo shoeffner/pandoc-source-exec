@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Fixing README links. Thanks @pareyesv .
+
 ## 0.1.2
 
 - Bugfix: when overwriting header-includes, pgfplots is now properly added and does not overwrite anymore.
