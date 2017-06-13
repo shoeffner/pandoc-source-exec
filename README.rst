@@ -28,13 +28,13 @@ Just use pip to install it from `pypi`_
 
 .. code-block:: shell
 
-    pip install pandoc-code-exec
+    pip install pandoc-source-exec
 
 
 .. _`filter`: https://pandoc.org/scripting.html
 .. _`pandoc`: https://pandoc.org/index.html
 .. _`panflute`: http://scorreia.com/software/panflute/index.html
-.. _`pypi`: https://pypi.python.org/pypi/pandoc-code-exec
+.. _`pypi`: https://pypi.python.org/pypi/pandoc-source-exec
 
 Future
 ------
