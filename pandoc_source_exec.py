@@ -5,6 +5,8 @@ import glob
 import os
 import subprocess
 
+__version__ = '0.1.4'
+
 try:
     from pexpect import replwrap
 except ImportError:
@@ -240,8 +242,8 @@ def action(elem, doc):
                     elem.text = remove_import_statements(elem.text)
 
                 if 'plt' in elem.attributes or 'plt' in elem.classes:
-                    result = '\n'.join(['\\begin{center}'] + \
-                                       result.splitlines()[10:] + \
+                    result = '\n'.join(['\\begin{center}'] +
+                                       result.splitlines()[10:] +
                                        ['\\end{center}'])
                     block = pf.RawBlock(result, format='latex')
                 else:
