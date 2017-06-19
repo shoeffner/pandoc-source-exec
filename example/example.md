@@ -263,3 +263,16 @@ plt.plot([1, 2, 3])
 Additionally `width=6cm` and `height=5cm` can be used. As a shortcut, one can
 instead use `plt=6cm,5cm`.
 
+~~~markdown
+```{ .python .exec .plt width=7cm height=2cm }
+import matplotlib.pyplot as plt
+
+plt.plot([1, 2, 3])
+```
+~~~
+
+```{ .python .exec .plt width=7cm height=2cm }
+import matplotlib.pyplot as plt
+
+plt.plot([1, 2, 3])
+```
