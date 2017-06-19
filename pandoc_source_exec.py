@@ -3,6 +3,7 @@ add the output to the pandoc document."""
 
 import glob
 import os
+import re
 import subprocess
 
 __version__ = '0.1.4'
@@ -211,7 +212,7 @@ def trimpath(attributes):
 
 
 def prepare(doc):
-    usepackage = '\\usepackage{pgfplots}'
+    usepackage = '\\usepackage{pgfplots}\n\\usepgfplotslibrary{groupplots}'
     include = pf.RawInline(usepackage, format='tex')
     try:
         if usepackage not in str(doc.metadata['header-includes']):
@@ -242,9 +243,10 @@ def action(elem, doc):
                     elem.text = remove_import_statements(elem.text)
 
                 if 'plt' in elem.attributes or 'plt' in elem.classes:
-                    result = '\n'.join(['\\begin{center}'] +
-                                       result.splitlines()[10:] +
-                                       ['\\end{center}'])
+                    begin = re.search('(% .* matplotlib2tikz v.*)',
+                                      result).end()
+                    result = ('\\begin{center}\n' + result[begin:] +
+                              '\n\\end{center}')
                     block = pf.RawBlock(result, format='latex')
                 else:
                     block = pf.CodeBlock(result, classes=['changelog'])
