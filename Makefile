@@ -27,7 +27,6 @@ clean:
 testpublish: package
 	@read -p "Enter the name of this package to verify upload to pypi test: " name ; \
 	if [ "$$name" == "$(package)" ]; then \
-		twine register -r pypitest $$(ls dist/*.tar.gz) ; \
 		twine upload -r pypitest dist/* ; \
 	else \
 		echo 'Sorry, this was wrong. Please try again.' ; \
@@ -37,7 +36,6 @@ testpublish: package
 publish: package
 	@read -p "Enter the name of this package to verify upload to pypi: " name ; \
 	if [ "$$name" == "$(package)" ]; then \
-		twine register -r pypi $$(ls dist/*.tar.gz) ; \
 		twine upload -r pypi dist/* ; \
 	else \
 		echo 'Sorry, this was wrong. Please try again.' ; \
