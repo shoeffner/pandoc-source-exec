@@ -103,7 +103,7 @@ def execute_interactive_code(elem, doc):
 
     final_code = []
     try:
-        child = replwrap.python()
+        child = replwrap.REPLWrapper("python", ">>> ", None)
     except NameError:
         pf.debug('Can not run interactive session. No output produced ' +
                  '(Code was:\n{!s}\n)'
@@ -115,7 +115,8 @@ def execute_interactive_code(elem, doc):
         final_code += [('>>> ' if i == 0 else '... ') + l for i, l in
                        enumerate(code_block)]
         if result:
-            final_code += result.split('\n')
+            final_code += [r for r in result.split('\n')
+                           if r.strip() not in code_block]
     return '\n'.join(final_code)
 
 
@@ -244,9 +245,10 @@ def action(elem, doc):
 
                 if 'plt' in elem.attributes or 'plt' in elem.classes:
                     begin = re.search('(% .* matplotlib2tikz v.*)',
-                                      result).end()
-                    result = ('\\begin{center}\n' + result[begin:] +
-                              '\n\\end{center}')
+                                      result)
+                    if begin:
+                        result = ('\\begin{center}\n' + result[begin.end():] +
+                                  '\n\\end{center}')
                     block = pf.RawBlock(result, format='latex')
                 else:
                     block = pf.CodeBlock(result, classes=['changelog'])
