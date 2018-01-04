@@ -1,8 +1,24 @@
 # Changelog
 
+## 0.2.0
+
+- Caption capabilities.
+- More complete documentation.
+- More examples.
+- Added hidden feature pathlength to examples.
+
+
+## 0.1.4
+
+- Flat directory structure.
+- Registration step for twine removed.
+- REPLWrapper partly fixed.
+
+
 ## 0.1.3
 
 - Fixing README links. Thanks @pareyesv .
+
 
 ## 0.1.2
 
