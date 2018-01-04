@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 
-__version__ = '0.1.4'
+__version__ = '0.2.0'
 
 try:
     from pexpect import replwrap
@@ -166,8 +166,8 @@ def remove_import_statements(code):
 def save_plot(code, elem):
     """Converts matplotlib plots to tikz code.
 
-    If elem has either the plt attribute (format: plt=width,height) or
-    the attributes width=width and/or height=height, the figurewidth and -height
+    If elem has either the plt attribute (format: plt=width,height) or the
+    attributes width=width and/or height=height, the figurewidth and -height
     are set accordingly. If none are given, a height of 4cm and a width of 6cm
     is used as default.
 
@@ -193,17 +193,28 @@ def save_plot(code, elem):
 
     return code + f"""
 from matplotlib2tikz import get_tikz_code
-tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidth}')
+tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidth}')  # noqa
 print(tikz)"""
 
 
 def trimpath(attributes):
+    """Simplifies the given path.
+
+    If pathdepth is in attributes, the last pathdepth elements will be
+    returned. If pathdepth is "full", the full path will be returned.
+    Otherwise the filename only will be returned.
+
+    Args:
+        attributes: The element attributes.
+
+    Returns:
+        The trimmed path.
+    """
     if 'pathdepth' in attributes:
         if attributes['pathdepth'] != 'full':
             pathelements = []
             remainder = attributes['file']
             limit = int(attributes['pathdepth'])
-            pf.debug('rem', remainder, 'limit', limit)
             while len(pathelements) < limit and remainder:
                 remainder, pe = os.path.split(remainder)
                 pathelements.insert(0, pe)
@@ -212,27 +223,78 @@ def trimpath(attributes):
     return os.path.basename(attributes['file'])
 
 
+def make_codelisting(inner_elements, caption):
+    """Creates a source code listing:
+
+        \begin{codelisting}[hbtp]
+        inner_elements
+        \caption[caption]{caption}
+        \end{codelisting}
+
+    and returns the list containing the pandoc elements.
+
+    Args:
+        inner_elements: A list of inner pandoc elements, usually a
+                        code block and potentially outputs etc.
+        caption:        The caption to be used. Will be used below code and in
+                        list of code listings.
+
+    Returns:
+        A list of elements for this codelisting.
+    """
+    begin = pf.RawBlock(r'\begin{codelisting}[hbtp]', format='tex')
+    end = pf.RawBlock(r'\end{codelisting}', format='tex')
+
+    cap_begin = f'\\caption[{caption}]{{'
+    caption_elem = pf.RawBlock(cap_begin + caption + '}', format='tex')
+    return [begin] + inner_elements + [caption_elem, end]
+
+
 def prepare(doc):
-    usepackage = '\\usepackage{pgfplots}\n\\usepgfplotslibrary{groupplots}'
-    include = pf.RawInline(usepackage, format='tex')
-    try:
-        if usepackage not in str(doc.metadata['header-includes']):
-            doc.metadata['header-includes']._content.list \
-                .insert(0, pf.MetaInlines(include))
-    except KeyError:
-        doc.metadata['header-includes'] = include
+    """Sets the caption_found and plot_found variables to False."""
+    doc.caption_found = False
+    doc.plot_found = False
+
+
+def maybe_center_plot(result):
+    """Embeds a possible tikz image inside a center environment.
+
+    Searches for matplotlib2tikz last commend line to detect tikz images.
+
+    Args:
+        result: The code execution result
+
+    Returns:
+        The input result if no tikzpicture was found, otherwise a centered
+        version.
+    """
+    begin = re.search('(% .* matplotlib2tikz v.*)', result)
+    if begin:
+        result = ('\\begin{center}\n' + result[begin.end():] +
+                  '\n\\end{center}')
+    return result
 
 
 def action(elem, doc):
-    if isinstance(elem, pf.CodeBlock):
+    """Processes pf.CodeBlocks.
 
+    For details and a specification of how each command should behave,
+    check the example files (especially the md and pdf)!
+
+    Args:
+        elem: The element to process.
+        doc:  The document.
+
+    Returns:
+        A changed element or None.
+    """
+    if isinstance(elem, pf.CodeBlock):
         elems = [elem] if 'hide' not in elem.classes else []
 
         if 'file' in elem.attributes.keys():
             elem.text = read_file(elem.attributes['file'])
-            elems.insert(0, pf.Para(pf.Emph(pf.Str('File:')),
-                                    pf.Space,
-                                    pf.Code(trimpath(elem.attributes))))
+            filename = trimpath(elem.attributes)
+            prefix = pf.Emph(pf.Str('File:'))
 
         if 'exec' in elem.classes:
             if 'interactive' in elem.classes or elem.text[:4] == '>>> ':
@@ -244,22 +306,64 @@ def action(elem, doc):
                     elem.text = remove_import_statements(elem.text)
 
                 if 'plt' in elem.attributes or 'plt' in elem.classes:
-                    begin = re.search('(% .* matplotlib2tikz v.*)',
-                                      result)
-                    if begin:
-                        result = ('\\begin{center}\n' + result[begin.end():] +
-                                  '\n\\end{center}')
+                    doc.plot_found = True
+                    result = maybe_center_plot(result)
                     block = pf.RawBlock(result, format='latex')
                 else:
                     block = pf.CodeBlock(result, classes=['changelog'])
 
                 elems += [pf.Para(pf.Emph(pf.Str('Output:'))), block]
 
+        if 'caption' in elem.attributes.keys():
+            doc.caption_found = True
+            cap = pf.convert_text(elem.attributes['caption'], output_format='latex')  # noqa
+            if 'file' in elem.attributes.keys():
+                cap += pf.convert_text(f'&nbsp;(`{filename}`)', output_format='latex')  # noqa
+            elems = make_codelisting(elems, cap)
+        elif 'caption' in elem.classes:
+            doc.caption_found = True
+            cap = ''
+            if 'file' in elem.attributes.keys():
+                cap = pf.convert_text(f'`{filename}`', output_format='latex')
+            elems = make_codelisting(elems, cap)
+        else:
+            if 'file' in elem.attributes.keys():
+                elems.insert(0, pf.Para(prefix, pf.Space,
+                                        pf.Code(filename)))
+
         return elems
 
 
 def finalize(doc):
-    pass
+    """Adds the pgfplots and caption packages to the header-includes if needed.
+    """
+    if doc.plot_found:
+        pgfplots_inline = pf.MetaInlines(pf.RawInline(
+            r'''%
+\makeatletter
+\@ifpackageloaded{pgfplots}{}{\usepackage{pgfplots}}
+\makeatother
+\usepgfplotslibrary{groupplots}
+''', format='tex'))
+        try:
+            doc.metadata['header-includes'].append(pgfplots_inline)
+        except KeyError:
+            doc.metadata['header-includes'] = pf.MetaList(pgfplots_inline)
+
+    if doc.caption_found:
+        caption_inline = pf.MetaInlines(pf.RawInline(
+            r'''%
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifundefined{codelisting}{%
+    \DeclareCaptionType{codelisting}[Code Listing][List of Code Listings]
+}{}
+\makeatother
+''', format='tex'))
+        try:
+            doc.metadata['header-includes'].append(caption_inline)
+        except KeyError:
+            doc.metadata['header-includes'] = pf.MetaList(caption_inline)
 
 
 def main(doc=None):

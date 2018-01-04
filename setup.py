@@ -27,7 +27,7 @@ setup(
   download_url='{}/tarball/{}'.format(REPOSITORY, __version__),
   modules=['pandoc_source_exec.py'],
   classifiers=[
-      'Development Status :: 3 - Alpha',
+      'Development Status :: 4 - Beta',
       'Intended Audience :: Science/Research',
       'License :: OSI Approved :: MIT License',
       'Natural Language :: English',

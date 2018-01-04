@@ -16,10 +16,16 @@ The above can be compiled like this:
 
 .. code-block:: Makefile
 
-    main:
-    	pandoc --filter pandoc-source-exec -o example.pdf example.md
+    example.pdf: example.md example.py
+    	pandoc --filter pandoc-source-exec -o $@ $<
 
 The resulting output will include `Hello World` after the code block.
+
+``pandoc-source-exec`` offers many other features, including tikz plots,
+proper figures and code listings as well as including files as code.
+
+For more examples check the `example files`_.
+
 
 Installation
 ------------
@@ -35,6 +41,8 @@ Just use pip to install it from `pypi`_
 .. _`pandoc`: https://pandoc.org/index.html
 .. _`panflute`: http://scorreia.com/software/panflute/index.html
 .. _`pypi`: https://pypi.python.org/pypi/pandoc-source-exec
+.. _`example files`: https://github.com/shoeffner/pandoc-source-exec/tree/master/example
+
 
 Future
 ------

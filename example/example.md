@@ -119,13 +119,14 @@ Interactive code will also be detected if the code block starts with `>>> `.
 
 *Note: This only works with python code so far, a custom command is not possible.*
 
-```{ .python .exec .interactive }
+*Note: The REPLWrapper changed, so this does only provide very limited support. In
+particular, only single-line-statements can be executed.*
+
+
+```{ .python .interactive .exec }
 >>> a = 5 + 4
 >>> 9 == a
->>> def h():
-...     print('Hello World')
-...
->>> h()
+>>> print(a)
 ```
 
 
@@ -133,6 +134,14 @@ Interactive code will also be detected if the code block starts with `>>> `.
 
 The following keywords (classes denoted by a prefixed `.`, attributes with
 a following `=`) exist:
+
+`.caption` and `caption=`
+  ~ Mutually exclusive. If `.caption` is used, instead of printing `File: ...`
+    above the code, a caption is created below (using the LaTeX package
+    `caption`) the listing and in the compiled LaTeX document the
+    `\listofcodelistings` macro becomes available. To specify a custom caption,
+    use `caption="My caption"`. If a filename was specified, this would render
+    to "My caption (path/to/file.py)".
 
 cmd=
   ~ Allows to specify a custom interpreter command to execute the code. For
@@ -160,6 +169,9 @@ file=
 
 `.hideimports`
 ~ Hides import statements in output. Currently only supported for Python.
+
+`pathlength=`
+~ Limits the number of path elements for a filename. If a path is e.g. `a/b/c/code.py` and `pathlength=2`, only `c/code.py` is shown. This is only useful using `file=`.
 
 
 ## Supported languages
@@ -276,3 +288,87 @@ import matplotlib.pyplot as plt
 
 plt.plot([1, 2, 3])
 ```
+
+## Captions
+
+Captions make proper "listing" environments, which are floating. They are set to `[htbp]`.
+
+### A normal "captionized" file
+
+This is Code Listing 1.
+
+~~~markdown
+```{ .python .caption file='example.py' }
+```
+~~~
+
+```{ .python .caption file='example.py' }
+```
+
+
+### A custom caption
+
+This is Code Listing 2.
+
+~~~markdown
+```{ .python caption="Custom caption" file='example.py' }
+```
+~~~
+
+```{ .python caption="Custom caption" file='example.py' }
+```
+
+
+### Caption for a normal code block
+
+This is Code Listing 3.
+
+~~~markdown
+```{ .python caption="Caption for a normal code block" }
+print('Hello World!')
+```
+~~~
+
+```{ .python caption="Caption for a normal code block" }
+print('Hello World!')
+```
+
+
+### Empty caption
+
+This is Code Listing 4. Note that empty captions are not included in the list
+of code listings (see below).
+
+~~~markdown
+```{ .python .caption }
+print('Hello World!')
+```
+~~~
+
+```{ .python .caption }
+print('Hello World!')
+```
+
+
+### Caption with execution does not work well
+
+This is Code Listing 5.
+
+~~~markdown
+```{ .python .exec caption="Simple 'Hello World'" }
+print('Hello World!')
+```
+~~~
+
+```{ .python .exec caption="Simple 'Hello World'" }
+print('Hello World!')
+```
+
+
+### List of Code Listings
+
+~~~markdown
+\listofcodelistings
+~~~
+
+\listofcodelistings
