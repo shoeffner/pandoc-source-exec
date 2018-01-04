@@ -12,7 +12,10 @@ try:
     from pexpect import replwrap
 except ImportError:
     pass
-import panflute as pf
+try:
+    import panflute as pf
+except ImportError:
+    pass
 
 
 EXECUTORS = {
