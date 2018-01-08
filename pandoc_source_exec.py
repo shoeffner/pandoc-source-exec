@@ -226,12 +226,12 @@ def trimpath(attributes):
     return os.path.basename(attributes['file'])
 
 
-def make_codelisting(inner_elements, caption):
+def make_codelisting(inner_elements, caption, label):
     """Creates a source code listing:
 
         \begin{codelisting}[hbtp]
         inner_elements
-        \caption[caption]{caption}
+        \caption[caption]{\label{label}caption}
         \end{codelisting}
 
     and returns the list containing the pandoc elements.
@@ -241,6 +241,7 @@ def make_codelisting(inner_elements, caption):
                         code block and potentially outputs etc.
         caption:        The caption to be used. Will be used below code and in
                         list of code listings.
+        label:          The label to use.
 
     Returns:
         A list of elements for this codelisting.
@@ -248,7 +249,7 @@ def make_codelisting(inner_elements, caption):
     begin = pf.RawBlock(r'\begin{codelisting}[hbtp]', format='tex')
     end = pf.RawBlock(r'\end{codelisting}', format='tex')
 
-    cap_begin = f'\\caption[{caption}]{{'
+    cap_begin = f'\\caption[{caption}]{{\\label{{{label}}}'
     caption_elem = pf.RawBlock(cap_begin + caption + '}', format='tex')
     return [begin] + inner_elements + [caption_elem, end]
 
@@ -257,6 +258,7 @@ def prepare(doc):
     """Sets the caption_found and plot_found variables to False."""
     doc.caption_found = False
     doc.plot_found = False
+    doc.listings_counter = 0
 
 
 def maybe_center_plot(result):
@@ -292,6 +294,7 @@ def action(elem, doc):
         A changed element or None.
     """
     if isinstance(elem, pf.CodeBlock):
+        doc.listings_counter += 1
         elems = [elem] if 'hide' not in elem.classes else []
 
         if 'file' in elem.attributes.keys():
@@ -317,18 +320,20 @@ def action(elem, doc):
 
                 elems += [pf.Para(pf.Emph(pf.Str('Output:'))), block]
 
+        label = elem.attributes.get('label', f'cl:{doc.listings_counter}')
+
         if 'caption' in elem.attributes.keys():
             doc.caption_found = True
             cap = pf.convert_text(elem.attributes['caption'], output_format='latex')  # noqa
             if 'file' in elem.attributes.keys():
                 cap += pf.convert_text(f'&nbsp;(`{filename}`)', output_format='latex')  # noqa
-            elems = make_codelisting(elems, cap)
+            elems = make_codelisting(elems, cap, label)
         elif 'caption' in elem.classes:
             doc.caption_found = True
             cap = ''
             if 'file' in elem.attributes.keys():
                 cap = pf.convert_text(f'`{filename}`', output_format='latex')
-            elems = make_codelisting(elems, cap)
+            elems = make_codelisting(elems, cap, label)
         else:
             if 'file' in elem.attributes.keys():
                 elems.insert(0, pf.Para(prefix, pf.Space,
