@@ -363,8 +363,11 @@ def finalize(doc):
             r'''%
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{cleveref}{}{\usepackage{cleveref}}
 \@ifundefined{codelisting}{%
     \DeclareCaptionType{codelisting}[Code Listing][List of Code Listings]
+    \crefname{codelisting}{code listing}{code listings}
+    \Crefname{codelisting}{Code Listing}{Code Listings}
 }{}
 \makeatother
 ''', format='tex'))
