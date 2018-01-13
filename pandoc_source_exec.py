@@ -226,7 +226,7 @@ def trimpath(attributes):
     return os.path.basename(attributes['file'])
 
 
-def make_codelisting(inner_elements, caption, label):
+def make_codelisting(inner_elements, caption, label, above=True):
     """Creates a source code listing:
 
         \begin{codelisting}[hbtp]
@@ -251,6 +251,8 @@ def make_codelisting(inner_elements, caption, label):
 
     cap_begin = f'\\caption[{caption}]{{\\label{{{label}}}'
     caption_elem = pf.RawBlock(cap_begin + caption + '}', format='tex')
+    if above:
+        return [begin, caption_elem] + inner_elements + [end]
     return [begin] + inner_elements + [caption_elem, end]
 
 
@@ -327,13 +329,15 @@ def action(elem, doc):
             cap = pf.convert_text(elem.attributes['caption'], output_format='latex')  # noqa
             if 'file' in elem.attributes.keys():
                 cap += pf.convert_text(f'&nbsp;(`{filename}`)', output_format='latex')  # noqa
-            elems = make_codelisting(elems, cap, label)
+            elems = make_codelisting(elems, cap, label,
+                                     'capbelow' not in elem.classes)
         elif 'caption' in elem.classes:
             doc.caption_found = True
             cap = ''
             if 'file' in elem.attributes.keys():
                 cap = pf.convert_text(f'`{filename}`', output_format='latex')
-            elems = make_codelisting(elems, cap, label)
+            elems = make_codelisting(elems, cap, label,
+                                     'capbelow' not in elem.classes)
         else:
             if 'file' in elem.attributes.keys():
                 elems.insert(0, pf.Para(prefix, pf.Space,
@@ -368,6 +372,7 @@ def finalize(doc):
     \DeclareCaptionType{codelisting}[Code Listing][List of Code Listings]
     \crefname{codelisting}{code listing}{code listings}
     \Crefname{codelisting}{Code Listing}{Code Listings}
+    \captionsetup[codelisting]{position=bottom}
 }{}
 \makeatother
 ''', format='tex'))
