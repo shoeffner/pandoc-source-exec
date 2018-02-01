@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- Adding short captions.
+- Adding capbelow option to place captions below the listing.
+
+
 ## 0.2.0
 
 - Caption capabilities.
