@@ -226,7 +226,8 @@ def trimpath(attributes):
     return os.path.basename(attributes['file'])
 
 
-def make_codelisting(inner_elements, caption, label, above=True):
+def make_codelisting(inner_elements, caption, label, *,
+                     shortcaption=None, above=True):
     """Creates a source code listing:
 
         \begin{codelisting}[hbtp]
@@ -242,6 +243,10 @@ def make_codelisting(inner_elements, caption, label, above=True):
         caption:        The caption to be used. Will be used below code and in
                         list of code listings.
         label:          The label to use.
+        shortcaption:   A short caption to be used in the list of code listings.
+                        If None, the normal caption will be used.
+        above:          The caption is placed above (True) or below (False)
+                        the code listing.
 
     Returns:
         A list of elements for this codelisting.
@@ -249,7 +254,9 @@ def make_codelisting(inner_elements, caption, label, above=True):
     begin = pf.RawBlock(r'\begin{codelisting}[hbtp]', format='tex')
     end = pf.RawBlock(r'\end{codelisting}', format='tex')
 
-    cap_begin = f'\\caption[{caption}]{{\\label{{{label}}}'
+    if not shortcaption:
+        shortcaption = caption
+    cap_begin = f'\\caption[{shortcaption}]{{\\label{{{label}}}'
     caption_elem = pf.RawBlock(cap_begin + caption + '}', format='tex')
     if above:
         return [begin, caption_elem] + inner_elements + [end]
@@ -327,17 +334,22 @@ def action(elem, doc):
         if 'caption' in elem.attributes.keys():
             doc.caption_found = True
             cap = pf.convert_text(elem.attributes['caption'], output_format='latex')  # noqa
+            if 'shortcaption' in elem.attributes.keys():
+                shortcap = pf.convert_text(elem.attributes['shortcaption'], output_format='latex')  # noqa
+            else:
+                shortcap = cap
             if 'file' in elem.attributes.keys():
                 cap += pf.convert_text(f'&nbsp;(`{filename}`)', output_format='latex')  # noqa
-            elems = make_codelisting(elems, cap, label,
-                                     'capbelow' not in elem.classes)
+
+            elems = make_codelisting(elems, cap, label, shortcaption=shortcap,
+                                     above='capbelow' not in elem.classes)
         elif 'caption' in elem.classes:
             doc.caption_found = True
             cap = ''
             if 'file' in elem.attributes.keys():
                 cap = pf.convert_text(f'`{filename}`', output_format='latex')
             elems = make_codelisting(elems, cap, label,
-                                     'capbelow' not in elem.classes)
+                                     above='capbelow' not in elem.classes)
         else:
             if 'file' in elem.attributes.keys():
                 elems.insert(0, pf.Para(prefix, pf.Space,

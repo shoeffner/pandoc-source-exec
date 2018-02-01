@@ -137,11 +137,17 @@ a following `=`) exist:
 
 `.caption` and `caption=`
   ~ Mutually exclusive. If `.caption` is used, instead of printing `File: ...`
-    above the code, a caption is created below (using the LaTeX package
+    above the code, a caption is created above (using the LaTeX package
     `caption`) the listing and in the compiled LaTeX document the
     `\listofcodelistings` macro becomes available. To specify a custom caption,
     use `caption="My caption"`. If a filename was specified, this would render
     to "My caption (path/to/file.py)".
+
+`.capbelow`
+  ~ Places the captions below the listing.
+
+`shortcaption=`
+  ~ A short caption to be used in the list of code listings.
 
 cmd=
   ~ Allows to specify a custom interpreter command to execute the code. For
@@ -168,10 +174,10 @@ file=
     specifying `cmd=`.
 
 `.hideimports`
-~ Hides import statements in output. Currently only supported for Python.
+  ~ Hides import statements in output. Currently only supported for Python.
 
 `pathlength=`
-~ Limits the number of path elements for a filename. If a path is e.g. `a/b/c/code.py` and `pathlength=2`, only `c/code.py` is shown. This is only useful using `file=`.
+  ~ Limits the number of path elements for a filename. If a path is e.g. `a/b/c/code.py` and `pathlength=2`, only `c/code.py` is shown. This is only useful using `file=`.
 
 
 ## Supported languages
@@ -350,9 +356,41 @@ print('Hello World!')
 ```
 
 
-### Caption with execution does not work well
+### Short captions
 
-This is Code Listing 5.
+Sometimes, long captions are too much for the list of code listings, thus you
+can provide a short caption:
+
+~~~markdown
+```{ .python caption="Long caption" shortcaption="Short" }
+print('Hello World!')
+```
+~~~
+
+```{ .python caption="Long caption" shortcaption="Short" }
+print('Hello World!')
+```
+
+
+### Placing a caption below
+
+By default, captions are placed above the code block. By using the class
+`capbelow`, this can be changed:
+
+~~~markdown
+```{ .python caption="Caption below" .capbelow }
+print('Hello World!')
+```
+~~~
+
+```{ .python caption="Caption below" .capbelow }
+print('Hello World!')
+```
+
+
+### Caption with execution does also work
+
+This is Code Listing 5 with an executed code block.
 
 ~~~markdown
 ```{ .python .exec caption="Simple 'Hello World'" }
