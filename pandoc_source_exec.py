@@ -194,7 +194,9 @@ def save_plot(code, elem):
         except KeyError:
             figurewidth = '6cm'
 
-    return code + f"""
+    return f"""import matplotlib
+matplotlib.use('TkAgg')
+{code}
 from matplotlib2tikz import get_tikz_code
 tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidth}')  # noqa
 print(tikz)"""
