@@ -230,7 +230,7 @@ def trimpath(attributes):
 
 def make_codelisting(inner_elements, caption, label, *,
                      shortcaption=None, above=True):
-    """Creates a source code listing:
+    r"""Creates a source code listing:
 
         \begin{codelisting}[hbtp]
         inner_elements
@@ -291,7 +291,7 @@ def maybe_center_plot(result):
     return result
 
 
-def action(elem, doc):
+def action(elem, doc):  # noqa
     """Processes pf.CodeBlocks.
 
     For details and a specification of how each command should behave,
