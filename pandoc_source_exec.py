@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 try:
     from pexpect import replwrap
