@@ -102,6 +102,16 @@ Using: `{ .python .exec file='example.py' }`
 ```{ .python .exec file='example.py' }
 ```
 
+### Working directory
+
+The working directory can be changed. This is especially useful in cases, where
+pandoc is executed in a different directory than the code.
+
+Using: `{ .python .exec file='example.py' wd='.' }`
+
+```{ .python .exec file='example.py' wd='.' }
+```
+
 
 ## File without execution
 
@@ -178,6 +188,9 @@ file=
 
 `pathlength=`
   ~ Limits the number of path elements for a filename. If a path is e.g. `a/b/c/code.py` and `pathlength=2`, only `c/code.py` is shown. This is only useful using `file=`.
+
+`wd=`
+  ~ Sets the working directory.
 
 
 ## Supported languages
