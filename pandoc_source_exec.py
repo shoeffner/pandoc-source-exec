@@ -72,6 +72,9 @@ def execute_code_block(elem, doc):
     if 'plt' in elem.attributes or 'plt' in elem.classes:
         code = save_plot(code, elem)
     command.append(code)
+    if 'args' in elem.attributes:
+        for arg in elem.attributes['args'].split():
+            command.append(arg)
 
     cwd = elem.attributes['wd'] if 'wd' in elem.attributes else None
 

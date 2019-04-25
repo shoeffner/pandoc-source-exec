@@ -102,6 +102,28 @@ Using: `{ .python .exec file='example.py' }`
 ```{ .python .exec file='example.py' }
 ```
 
+### Program arguments
+
+When loading a file, it often accepts some command line arguments.
+Specify these with `args=`.
+
+Using: `{ .python .exec args="-a 1" }`
+
+```{ .python .exec args="-a 1" }
+import sys
+
+print(sys.argv)
+```
+
+Note that since the code is currently read from files first and then passed to
+the interpreter as a string, `-c` is always the first argument!
+
+Using: `{ .python .exec file=args.py args=-t }`
+
+```{ .python .exec file=args.py args=-t }
+```
+
+
 ### Working directory
 
 The working directory can be changed. This is especially useful in cases, where
