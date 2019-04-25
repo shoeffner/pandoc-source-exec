@@ -201,7 +201,7 @@ def save_plot(code, elem):
 matplotlib.use('TkAgg')
 {code}
 from matplotlib2tikz import get_tikz_code
-tikz = get_tikz_code('', figureheight='{figureheight}', figurewidth='{figurewidth}')  # noqa
+tikz = get_tikz_code(figureheight='{figureheight}', figurewidth='{figurewidth}')  # noqa
 print(tikz)"""
 
 
