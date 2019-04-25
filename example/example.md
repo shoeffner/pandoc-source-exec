@@ -102,6 +102,23 @@ Using: `{ .python .exec file='example.py' }`
 ```{ .python .exec file='example.py' }
 ```
 
+It is also possible to only include several lines in the output. These lines
+are omitted *after* execution.
+
+Using: `{ .python .exec file=example.py lines=3-5 }`
+
+```{ .python .exec file=example.py lines=3-5 }
+```
+
+Possible values for specifying lines are:
+
+- `#`: single line number
+- `start-end`: a line range from start to end, including both
+- `-end`: from the start (1) to end, inclusive
+- `start-`: from start (inclusive) to the end of the file
+- any combination of the above, separated by commas: `4-7,11-,9,1`
+
+
 ### Program arguments
 
 When loading a file, it often accepts some command line arguments.
@@ -181,21 +198,28 @@ a following `=`) exist:
 `shortcaption=`
   ~ A short caption to be used in the list of code listings.
 
-cmd=
+`cmd=`
   ~ Allows to specify a custom interpreter command to execute the code. For
     example, to run ruby code one could use `cmd='ruby -e'`.
 
-.exec
+`.exec`
   ~ Executes the following code cell according to the specified language. By
     default, it is only `echo`ed.
 
-file=
+`file=`
   ~ Replaces the code cell with content from the specified file. This searches
     recursively for files matching the pattern, so if you use `file=code.py`
     but your code is in fact in `src/code.py` it will still be found. Specify
     the full path to avoid ambiguities.
 
-.interactive
+`lines=`
+  ~ Only the selected lines will be printed (but all will be executed). Can be
+    specified using something like: `-5,7,9,11,14-17,19,22-`. A `-` without a
+    left or right means "from the beginning" or "until the end", otherwise `-`
+    denotes a range. Single numbers are single lines, multiple specifications
+    can be combined using `,`.
+
+`.interactive`
   ~ Executes the code as if it was inserted into an interactive session,
     returns results inline into the original code block. Only works for python
     code so far.

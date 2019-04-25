@@ -146,6 +146,46 @@ def read_file(filename):
         return f.read()
 
 
+def filter_lines(code, line_spec):
+    """Removes all lines not matching the line_spec.
+
+    Args:
+        code The code to filter
+        line_spec The line specification. This should be a comma-separated
+                  string of lines or line ranges, e.g. 1,2,5-12,15
+                  If a line range starts with -, all lines up to this line are
+                  included.
+                  If a line range ends with -, all lines from this line on are
+                  included.
+                  All lines mentioned (ranges are inclusive) are used.
+    Returns:
+        Only the specified lines.
+    """
+    code_lines = code.splitlines()
+
+    line_specs = [line_denom.strip() for line_denom in line_spec.split(',')]
+
+    single_lines = set(map(int, filter(lambda line: '-' not in line, line_specs)))
+    line_ranges = set(filter(lambda line: '-' in line, line_specs))
+
+    for line_range in line_ranges:
+        begin, end = line_range.split('-')
+        if not begin:
+            begin = 1
+        if not end:
+            end = len(code_lines)
+        single_lines.update(range(int(begin), int(end) + 1))
+
+    keep_lines = []
+    for line_number, line in enumerate(code_lines, 1):
+        if line_number in single_lines:
+            keep_lines.append(line)
+
+    return '\n'.join(keep_lines)
+
+
+
+
 def remove_import_statements(code):
     """Removes lines with import statements from the code.
 
@@ -311,7 +351,7 @@ def action(elem, doc):  # noqa
         doc.listings_counter += 1
         elems = [elem] if 'hide' not in elem.classes else []
 
-        if 'file' in elem.attributes.keys():
+        if 'file' in elem.attributes:
             elem.text = read_file(elem.attributes['file'])
             filename = trimpath(elem.attributes)
             prefix = pf.Emph(pf.Str('File:'))
@@ -333,6 +373,9 @@ def action(elem, doc):  # noqa
                     block = pf.CodeBlock(result, classes=['changelog'])
 
                 elems += [pf.Para(pf.Emph(pf.Str('Output:'))), block]
+
+        if 'lines' in elem.attributes:
+            elem.text = filter_lines(elem.text, elem.attributes['lines'])
 
         label = elem.attributes.get('label', f'cl:{doc.listings_counter}')
 
