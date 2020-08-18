@@ -356,6 +356,12 @@ def action(elem, doc):  # noqa
             filename = trimpath(elem.attributes)
             prefix = pf.Emph(pf.Str('File:'))
 
+        # Allow boolean values with value "True" to be specified as attributes,
+        # but used as classes.
+        for a, v in elem.attributes.items():
+            if v.lower() == 'true':
+                elem.classes.append(a)
+
         if 'exec' in elem.classes:
             if 'interactive' in elem.classes or elem.text[:4] == '>>> ':
                 elem.text = execute_interactive_code(elem, doc)
