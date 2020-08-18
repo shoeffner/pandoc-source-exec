@@ -14,6 +14,7 @@ shutilwhich = "==1.1.0"
 PyYAML = ">=4.2b1"
 pexpect = "*"
 pandoc-source-exec = {editable = true, path = "."}
+pillow = ">=7.1.0"
 
 [requires]
 python_version = "3.7"
