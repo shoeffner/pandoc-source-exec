@@ -372,13 +372,14 @@ def action(elem, doc):  # noqa
                 else:
                     block = pf.CodeBlock(result, classes=['changelog'])
 
-                output_label = 'Output:'
-                if 'output_label' in elem.attributes:
-                    output_label = elem.attributes['output_label']
-                if output_label != '':
-                    elems += [pf.Para(pf.Emph(pf.Str(output_label))), block]
-                else:
-                    elems += [block]
+                if result:
+                    output_label = 'Output:'
+                    if 'output_label' in elem.attributes:
+                        output_label = elem.attributes['output_label']
+                    if output_label != '':
+                        elems += [pf.Para(pf.Emph(pf.Str(output_label))), block]
+                    else:
+                        elems += [block]
 
         if 'lines' in elem.attributes:
             elem.text = filter_lines(elem.text, elem.attributes['lines'])
